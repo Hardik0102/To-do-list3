@@ -1,4 +1,5 @@
-let cardCounter = 0;
+let cardCounter = 1;
+let taskCounter = 1;
 
 function addCard() {
     var newCard = document.createElement('div');
@@ -12,7 +13,7 @@ function addCard() {
         <div class="card" contenteditable="true" onblur="updateTitle('${cardId}', this.innerText)">${cardId}</div>
         <div class="input-box">
             <input type="text" id="listName_${cardId}" placeholder="Enter list Title"><br>
-            <button onclick="addTask('${cardId}')"><i class="fa fa-plus"></i></button>
+            <button onclick="addTask(event, '${cardId}')"><i class="fa fa-plus"></i></button>
         </div>
         <div class="taskList"></div>
         <div class="listButton">
@@ -23,18 +24,23 @@ function addCard() {
     document.getElementById('cardContainer').appendChild(newCard);
 }
 
-function addTask(cardId) {
+function addTask(e, cardId) {
     var inputElement = document.getElementById(`listName_${cardId}`);
     var listTitle = inputElement.value;
 
     if (listTitle.trim() !== "") {
         var taskList = document.createElement('ul');
         var taskItem = document.createElement('li');
+        var taskId = `task${taskCounter}`; //`task${cardCounter}${taskCounter}`
+        const numericId = cardId.replace(/[^\d.-]/g, '') + taskCounter;
+
+
+        taskCounter++;
         taskItem.innerHTML = `
             <span class="listContent"> 
-                <span id="leftlistCon">${listTitle}</span>
+                <span id="${numericId}" contenteditable="true">${listTitle}</span>
                 <span id="RightlistCon">
-                    <button class="editButton" onclick="editTask(this)"><i class="fas fa-edit"></i></button>
+                    <button class="editButton" onclick="editTask('${taskId}')"><i class="fas fa-edit"></i></button>
                     <button class="editButton1" onclick="deleteTask(this)"><i class="fas fa-trash"></i></button>
                 </span>
             </span>
@@ -46,12 +52,29 @@ function addTask(cardId) {
         var taskListContainer = card.querySelector('.taskList');
         taskListContainer.appendChild(taskList);
 
-       
         inputElement.value = "";
+    }
+}
+
+function editTask(taskId) {
+    var taskElement = document.getElementById(taskId);
+
+    if (!taskElement.isContentEditable) {
+    
+        taskElement.setAttribute('data-original-content', taskElement.innerText);
+        taskElement.contentEditable = true;
+        taskElement.focus();
+    } else {
         
-        taskItem.querySelector('.editButton1').onclick = function() {
-            deleteTask(this);
-        };
+        taskElement.contentEditable = false;
+
+       
+        var editedContent = taskElement.innerText;
+
+       
+
+      
+        console.log(`Task ${taskId} edited. New content: ${editedContent}`);
     }
 }
 
